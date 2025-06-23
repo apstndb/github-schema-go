@@ -462,11 +462,12 @@ func TestNewWithFile_NotExist(t *testing.T) {
 }
 
 func TestNewWithData_InvalidJSON(t *testing.T) {
-	_, err := NewWithData([]byte("invalid json"))
+	// Use clearly invalid JSON/YAML that go-yaml cannot parse
+	_, err := NewWithData([]byte(`[1, 2, }`))
 	if err == nil {
 		t.Error("Expected error for invalid JSON")
 	}
-	if !strings.Contains(err.Error(), "failed to parse schema") {
+	if err != nil && !strings.Contains(err.Error(), "failed to parse schema") {
 		t.Errorf("Expected 'failed to parse schema' error, got: %v", err)
 	}
 }

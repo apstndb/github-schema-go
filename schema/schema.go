@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"compress/gzip"
 	_ "embed"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
 	"os"
 	"sort"
 
+	"github.com/apstndb/github-schema-go/internal/marshal"
 	"github.com/itchyny/gojq"
 )
 
@@ -62,7 +62,8 @@ func NewWithFile(path string) (*Schema, error) {
 // NewWithData creates a Schema instance from raw JSON data
 func NewWithData(data []byte) (*Schema, error) {
 	var schema interface{}
-	if err := json.Unmarshal(data, &schema); err != nil {
+	// Use consistent unmarshaling with proper number handling
+	if err := marshal.Unmarshal(data, &schema); err != nil {
 		return nil, fmt.Errorf("failed to parse schema: %w", err)
 	}
 

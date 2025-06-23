@@ -1,15 +1,14 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
 	"strings"
 
+	"github.com/apstndb/github-schema-go/internal/output"
 	"github.com/apstndb/github-schema-go/schema"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -215,13 +214,11 @@ func getSchema() (*schema.Schema, error) {
 }
 
 func outputResult(result interface{}) error {
+	format := output.FormatYAML
 	if outputJSON {
-		encoder := json.NewEncoder(os.Stdout)
-		encoder.SetIndent("", "  ")
-		return encoder.Encode(result)
+		format = output.FormatJSON
 	}
-
-	// Default to YAML
-	encoder := yaml.NewEncoder(os.Stdout)
+	
+	encoder := output.NewEncoder(os.Stdout, format)
 	return encoder.Encode(result)
 }

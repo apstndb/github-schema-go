@@ -3,12 +3,13 @@ package schema
 import (
 	"bytes"
 	"compress/gzip"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"os/exec"
+
+	"github.com/apstndb/github-schema-go/internal/marshal"
 )
 
 const (
@@ -133,7 +134,7 @@ func DownloadAndCompressSchema(outputPath string) error {
 		"query": IntrospectionQuery,
 	}
 	
-	jsonBody, err := json.Marshal(requestBody)
+	jsonBody, err := marshal.MarshalJSON(requestBody)
 	if err != nil {
 		return fmt.Errorf("failed to marshal request: %w", err)
 	}
@@ -175,7 +176,7 @@ func DownloadAndCompressSchema(outputPath string) error {
 		
 		// Validate it's valid JSON
 		var result map[string]interface{}
-		if err := json.Unmarshal(body, &result); err != nil {
+		if err := marshal.Unmarshal(body, &result); err != nil {
 			return fmt.Errorf("failed to parse response as JSON: %w", err)
 		}
 		
@@ -233,7 +234,7 @@ func DownloadAndCompressToWriter(w io.Writer) error {
 		"query": IntrospectionQuery,
 	}
 	
-	jsonBody, err := json.Marshal(requestBody)
+	jsonBody, err := marshal.MarshalJSON(requestBody)
 	if err != nil {
 		return fmt.Errorf("failed to marshal request: %w", err)
 	}
@@ -302,7 +303,7 @@ func DownloadIntrospectionSchema(outputPath string) error {
 		"query": IntrospectionQuery,
 	}
 	
-	jsonBody, err := json.Marshal(requestBody)
+	jsonBody, err := marshal.MarshalJSON(requestBody)
 	if err != nil {
 		return fmt.Errorf("failed to marshal request: %w", err)
 	}
@@ -336,7 +337,7 @@ func DownloadIntrospectionSchema(outputPath string) error {
 	
 	// Validate it's valid JSON
 	var result map[string]interface{}
-	if err := json.Unmarshal(body, &result); err != nil {
+	if err := marshal.Unmarshal(body, &result); err != nil {
 		return fmt.Errorf("failed to parse response as JSON: %w", err)
 	}
 	
@@ -368,7 +369,7 @@ func DownloadIntrospectionToWriter(w io.Writer) error {
 		"query": IntrospectionQuery,
 	}
 	
-	jsonBody, err := json.Marshal(requestBody)
+	jsonBody, err := marshal.MarshalJSON(requestBody)
 	if err != nil {
 		return fmt.Errorf("failed to marshal request: %w", err)
 	}
