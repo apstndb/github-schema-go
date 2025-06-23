@@ -14,8 +14,8 @@ import (
 	"github.com/itchyny/gojq"
 )
 
-// Embed the GitHub GraphQL schema
-// This file is downloaded from https://github.com/github/docs/tree/main/src/graphql/data/fpt
+// Embed the GitHub GraphQL schema in standard introspection format
+// This file is obtained via GitHub GraphQL API introspection query
 //
 //go:embed schema.json.gz
 var embeddedSchema []byte

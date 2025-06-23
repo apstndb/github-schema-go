@@ -22,7 +22,7 @@ var rootCmd = &cobra.Command{
 	Use:   "github-schema",
 	Short: "Query GitHub GraphQL schema offline",
 	Long: `Query GitHub GraphQL schema using embedded data or custom schema files.
-Schema source: https://github.com/github/docs/tree/main/src/graphql/data/fpt`,
+The embedded schema is obtained via GitHub GraphQL API introspection.`,
 }
 
 var typeCmd = &cobra.Command{
@@ -84,9 +84,9 @@ var searchCmd = &cobra.Command{
 
 var downloadCmd = &cobra.Command{
 	Use:   "download",
-	Short: "Download latest schema from github/docs",
-	Long: `Download the latest GitHub GraphQL schema from:
-https://github.com/github/docs/tree/main/src/graphql/data/fpt/schema.json
+	Short: "Download latest schema via GraphQL introspection",
+	Long: `Download the latest GitHub GraphQL schema using introspection query.
+Requires 'gh auth login' to be configured.
 
 Examples:
   github-schema download                           # Download to stdout
@@ -119,8 +119,8 @@ Examples:
 		}
 		
 		// Write to file
-		slog.Info("Downloading schema", 
-			"url", schema.SchemaURL,
+		slog.Info("Downloading schema via introspection", 
+			"endpoint", schema.GitHubAPIURL,
 			"output", outputFile,
 			"compress", compress)
 		

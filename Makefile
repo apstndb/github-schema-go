@@ -21,6 +21,7 @@ install:
 # Clean generated files
 clean:
 	rm -f schema/schema.json
+	rm -f schema/schema.json.gz
 	rm -f bin/github-schema
 
 # Check if schema needs update
