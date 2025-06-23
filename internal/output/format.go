@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/apstndb/github-schema-go/internal/marshal"
 	"github.com/goccy/go-yaml"
 	"github.com/spf13/cobra"
 )
@@ -35,17 +36,11 @@ func ParseFormat(s string) (Format, error) {
 func NewEncoder(w io.Writer, format Format) *yaml.Encoder {
 	switch format {
 	case FormatJSON:
-		return yaml.NewEncoder(w, 
-			yaml.JSON(),
-			yaml.UseJSONMarshaler(),
-		)
+		return marshal.NewJSONEncoder(w)
 	case FormatYAML:
-		return yaml.NewEncoder(w,
-			yaml.UseJSONMarshaler(),
-			yaml.UseLiteralStyleIfMultiline(true),
-		)
+		return marshal.NewEncoder(w, yaml.UseLiteralStyleIfMultiline(true))
 	default:
-		return yaml.NewEncoder(w, yaml.UseJSONMarshaler()) // Default to YAML
+		return marshal.NewEncoder(w) // Default to YAML
 	}
 }
 
