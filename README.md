@@ -10,6 +10,7 @@ A Go module and CLI tool for querying GitHub GraphQL schema offline using embedd
 - Pure jq queries using [gojq](https://github.com/itchyny/gojq)
 - Zero GraphQL client dependencies
 - Native compression support using GitHub API gzip
+- Consistent YAML/JSON formatting (via [go-yamlformat](https://github.com/apstndb/go-yamlformat))
 
 ## Installation
 

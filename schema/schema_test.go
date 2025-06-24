@@ -354,7 +354,7 @@ func TestQuery(t *testing.T) {
 		{
 			name:      "query with variable",
 			query:     `.data.__schema.types[] | select(.name == $name) | .kind`,
-			variables: map[string]interface{}{"$name": "PullRequest"},
+			variables: map[string]interface{}{"name": "PullRequest"},
 			wantErr:   false,
 			validate: func(t *testing.T, result interface{}) {
 				kind := result.(string)
@@ -394,8 +394,8 @@ func TestVariableHandling(t *testing.T) {
 	// Test that variables are properly sorted and passed
 	query := `.data.__schema.types[] | select(.name == $b or .name == $a) | .name`
 	variables := map[string]interface{}{
-		"$b": "Issue",
-		"$a": "PullRequest",
+		"b": "Issue",
+		"a": "PullRequest",
 	}
 
 	result, err := s.Query(query, variables)
