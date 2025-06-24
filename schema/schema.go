@@ -3,15 +3,15 @@ package schema
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
 	_ "embed"
 	"fmt"
 	"io"
 	"log/slog"
 	"os"
-	"sort"
 
-	"github.com/apstndb/github-schema-go/internal/marshal"
-	"github.com/itchyny/gojq"
+	jqyaml "github.com/apstndb/go-jq-yamlformat"
+	"github.com/apstndb/go-yamlformat"
 )
 
 // Embed the GitHub GraphQL schema in standard introspection format
@@ -63,7 +63,7 @@ func NewWithFile(path string) (*Schema, error) {
 func NewWithData(data []byte) (*Schema, error) {
 	var schema interface{}
 	// Use consistent unmarshaling with proper number handling
-	if err := marshal.Unmarshal(data, &schema); err != nil {
+	if err := yamlformat.Unmarshal(data, &schema); err != nil {
 		return nil, fmt.Errorf("failed to parse schema: %w", err)
 	}
 
@@ -73,63 +73,50 @@ func NewWithData(data []byte) (*Schema, error) {
 // Type queries information about a GraphQL type
 func (s *Schema) Type(typeName string) (map[string]interface{}, error) {
 	query := typeQuery
-	return s.runQuery(query, map[string]interface{}{"$type": typeName})
+	return s.runQuery(query, map[string]interface{}{"type": typeName})
 }
 
 // Search searches for types matching a pattern
 func (s *Schema) Search(pattern string) (map[string]interface{}, error) {
 	query := searchQuery
-	return s.runQuery(query, map[string]interface{}{"$pattern": pattern})
+	return s.runQuery(query, map[string]interface{}{"pattern": pattern})
 }
 
 // Mutation queries information about a GraphQL mutation
 func (s *Schema) Mutation(mutationName string) (map[string]interface{}, error) {
 	query := mutationQuery
-	return s.runQuery(query, map[string]interface{}{"$mutation": mutationName})
+	return s.runQuery(query, map[string]interface{}{"mutation": mutationName})
 }
 
 // Query runs a custom jq query on the schema
 func (s *Schema) Query(jqQuery string, variables map[string]interface{}) (interface{}, error) {
-	parsed, err := gojq.Parse(jqQuery)
+	// Create pipeline with the query
+	pipeline, err := jqyaml.New(jqyaml.WithQuery(jqQuery))
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse jq query: %w", err)
+		return nil, fmt.Errorf("failed to create jq pipeline: %w", err)
 	}
 
-	// Extract variable names and values in order
-	var varNames []string
-	var varValues []interface{}
-	if variables != nil {
-		// Sort keys for consistent ordering
-		for k := range variables {
-			varNames = append(varNames, k)
-		}
-		sort.Strings(varNames)
-		for _, k := range varNames {
-			varValues = append(varValues, variables[k])
-		}
-	}
-
-	// Compile with variable names
-	code, err := gojq.Compile(parsed, gojq.WithVariables(varNames))
-	if err != nil {
-		return nil, fmt.Errorf("failed to compile jq query: %w", err)
-	}
-
-	// Run with schema data and variable values
-	iter := code.Run(s.data, varValues...)
-	
+	// Collect results using a custom callback
 	var results []interface{}
-	for {
-		v, ok := iter.Next()
-		if !ok {
-			break
-		}
-		if err, ok := v.(error); ok {
-			return nil, fmt.Errorf("jq execution error: %w", err)
-		}
-		results = append(results, v)
+	opts := []jqyaml.ExecuteOption{
+		jqyaml.WithCallback(func(item interface{}) error {
+			results = append(results, item)
+			return nil
+		}),
+	}
+	
+	// Add variables if provided
+	if variables != nil {
+		opts = append(opts, jqyaml.WithVariables(variables))
 	}
 
+	// Execute the pipeline
+	ctx := context.Background()
+	if err := pipeline.Execute(ctx, s.data, opts...); err != nil {
+		return nil, err
+	}
+
+	// Return results based on count
 	if len(results) == 0 {
 		return nil, nil
 	}

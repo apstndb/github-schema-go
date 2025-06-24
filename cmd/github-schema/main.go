@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/apstndb/github-schema-go/internal/output"
+	"github.com/apstndb/go-yamlformat"
 	"github.com/apstndb/github-schema-go/schema"
 	"github.com/spf13/cobra"
 )
@@ -214,11 +214,11 @@ func getSchema() (*schema.Schema, error) {
 }
 
 func outputResult(result interface{}) error {
-	format := output.FormatYAML
+	format := yamlformat.FormatYAML
 	if outputJSON {
-		format = output.FormatJSON
+		format = yamlformat.FormatJSON
 	}
 	
-	encoder := output.NewEncoder(os.Stdout, format)
+	encoder := yamlformat.NewEncoderForFormat(os.Stdout, format)
 	return encoder.Encode(result)
 }

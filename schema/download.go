@@ -9,7 +9,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/apstndb/github-schema-go/internal/marshal"
+	"github.com/apstndb/go-yamlformat"
 )
 
 const (
@@ -134,7 +134,7 @@ func DownloadAndCompressSchema(outputPath string) error {
 		"query": IntrospectionQuery,
 	}
 	
-	jsonBody, err := marshal.MarshalJSON(requestBody)
+	jsonBody, err := yamlformat.MarshalJSON(requestBody)
 	if err != nil {
 		return fmt.Errorf("failed to marshal request: %w", err)
 	}
@@ -176,7 +176,7 @@ func DownloadAndCompressSchema(outputPath string) error {
 		
 		// Validate it's valid JSON
 		var result map[string]interface{}
-		if err := marshal.Unmarshal(body, &result); err != nil {
+		if err := yamlformat.Unmarshal(body, &result); err != nil {
 			return fmt.Errorf("failed to parse response as JSON: %w", err)
 		}
 		
@@ -234,7 +234,7 @@ func DownloadAndCompressToWriter(w io.Writer) error {
 		"query": IntrospectionQuery,
 	}
 	
-	jsonBody, err := marshal.MarshalJSON(requestBody)
+	jsonBody, err := yamlformat.MarshalJSON(requestBody)
 	if err != nil {
 		return fmt.Errorf("failed to marshal request: %w", err)
 	}
@@ -303,7 +303,7 @@ func DownloadIntrospectionSchema(outputPath string) error {
 		"query": IntrospectionQuery,
 	}
 	
-	jsonBody, err := marshal.MarshalJSON(requestBody)
+	jsonBody, err := yamlformat.MarshalJSON(requestBody)
 	if err != nil {
 		return fmt.Errorf("failed to marshal request: %w", err)
 	}
@@ -337,7 +337,7 @@ func DownloadIntrospectionSchema(outputPath string) error {
 	
 	// Validate it's valid JSON
 	var result map[string]interface{}
-	if err := marshal.Unmarshal(body, &result); err != nil {
+	if err := yamlformat.Unmarshal(body, &result); err != nil {
 		return fmt.Errorf("failed to parse response as JSON: %w", err)
 	}
 	
@@ -369,7 +369,7 @@ func DownloadIntrospectionToWriter(w io.Writer) error {
 		"query": IntrospectionQuery,
 	}
 	
-	jsonBody, err := marshal.MarshalJSON(requestBody)
+	jsonBody, err := yamlformat.MarshalJSON(requestBody)
 	if err != nil {
 		return fmt.Errorf("failed to marshal request: %w", err)
 	}
